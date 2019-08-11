@@ -1,4 +1,6 @@
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -8,128 +10,96 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 
 public class TesteCadastro {
-
-//	@Test	
-	public void deveRealizarCadastro(){
+	
+	private WebDriver driver;
+	private DSL dsl;
+	
+	@Before
+	public void setUp() {
 		System.setProperty("webdriver.chrome.driver", "/home/tiago/Drivers/chromedriver");
-		WebDriver driver = new ChromeDriver();
+		driver = new ChromeDriver();
 		driver.manage().window().setSize(new Dimension(1300, 1050));
 		driver.get("file:///" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
+		dsl = new DSL(driver);
+	}
 	
-		driver.findElement(By.id("elementosForm:nome")).sendKeys("Wagner");
-		driver.findElement(By.id("elementosForm:sobrenome")).sendKeys("Costa");
-		driver.findElement(By.id("elementosForm:sexo")).click();
-		driver.findElement(By.id("elementosForm:comidaFavorita:2")).click();
-		
-		new Select(driver.findElement(By.id("elementosForm:escolaridade")))
-			.selectByVisibleText("Mestrado");
-		
-		new Select(driver.findElement(By.id("elementosForm:esportes")))
-			.selectByValue("Corrida");
-		
-		driver.findElement(By.id("elementosForm:cadastrar")).click();
-		
-		Assert.assertEquals("Mensagem de cadastrado", "Cadastrado!", driver.findElement(
-				By.id("resultado")).findElement(By.tagName("span")).getText());
-		
-		Assert.assertEquals("Nome cadastrado", "Wagner", driver.findElement(
-				By.id("descNome")).findElement(By.tagName("span")).getText());
-		Assert.assertEquals("Sobrenome Cadastrado", "Costa", driver.findElement(
-				By.id("descSobrenome")).findElement(By.tagName("span")).getText());
-		Assert.assertEquals("Sexo Cadastrado", "Masculino", driver.findElement(
-				By.id("descSexo")).findElement(By.tagName("span")).getText());
-		Assert.assertEquals("Comida cadastrada", "Comida: Pizza", driver.findElement(By.id("descComida")).getText());
-		Assert.assertEquals("Escolaridade cadastrada", "Escolaridade: mestrado", driver.findElement(By.id("descEscolaridade")).getText());
-		Assert.assertEquals("Esporte cadastrado", "Esportes: Corrida", driver.findElement(By.id("descEsportes")).getText());
-		
+	@After
+	public void tearDown() {
 		driver.quit();
+	}	
+
+	@Test	
+	public void deveRealizarCadastro(){	
+		dsl.escrever("elementosForm:nome", "Wagner");
+		dsl.escrever("elementosForm:sobrenome", "Costa");
+		dsl.clicarRadio("elementosForm:sexo");		
+		dsl.clicarRadio("elementosForm:comidaFavorita:2");
+		dsl.selecionar("elementosForm:escolaridade", "Mestrado");
+		dsl.selecionar("elementosForm:esportes", "Corrida");
+		dsl.clicarBotao("elementosForm:cadastrar");
+
+		Assert.assertTrue(dsl.obterTexto("resultado").startsWith("Cadastrado!"));		
+		Assert.assertTrue(dsl.obterTexto("descNome").endsWith("Wagner"));
+		Assert.assertEquals("Sobrenome: Costa", dsl.obterTexto("descSobrenome"));
+		Assert.assertEquals("Sexo: Masculino", dsl.obterTexto("descSexo"));
+		Assert.assertEquals("Comida: Pizza", dsl.obterTexto("descComida"));
+		Assert.assertEquals("Escolaridade: mestrado", dsl.obterTexto("descEscolaridade"));
+		Assert.assertEquals("Esportes: Corrida", dsl.obterTexto("descEsportes"));
 	}
 	
 	@Test
-	public void deveValidarNome() {
-		System.setProperty("webdriver.chrome.driver", "/home/tiago/Drivers/chromedriver");
-		WebDriver driver = new ChromeDriver();
-		driver.manage().window().setSize(new Dimension(1300, 1050));
-		driver.get("file:///" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
-		
-		driver.findElement(By.id("elementosForm:cadastrar")).click();
+	public void deveValidarNome() {		
+		dsl.clicarBotao("elementosForm:cadastrar");
 		Alert alert = driver.switchTo().alert();
-		Assert.assertEquals("Mensagem de alerta: enome obrigatório", 
+		Assert.assertEquals("Mensagem de alerta: nome obrigatório", 
 				"Nome eh obrigatorio", alert.getText());
-		alert.accept();
-		driver.quit();
+		alert.accept();		
 	}
 
 	@Test
-	public void deveValidarSobrenome() {
-		System.setProperty("webdriver.chrome.driver", "/home/tiago/Drivers/chromedriver");
-		WebDriver driver = new ChromeDriver();
-		driver.manage().window().setSize(new Dimension(1300, 1050));
-		driver.get("file:///" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
-		
-		driver.findElement(By.id("elementosForm:nome")).sendKeys("Wanderson");
-		driver.findElement(By.id("elementosForm:cadastrar")).click();
+	public void deveValidarSobrenome() {		
+		dsl.escrever("elementosForm:nome", "Wanderson");
+		dsl.clicarBotao("elementosForm:cadastrar");
 		Alert alert = driver.switchTo().alert();
 		Assert.assertEquals("Msg alerta: sobrenome obrigatório", "Sobrenome eh obrigatorio", 
 				alert.getText());
-		alert.accept();
-		driver.quit();		
+		alert.accept();	
 	}
 
 	@Test
-	public void deveValidarSexo() {
-		System.setProperty("webdriver.chrome.driver", "/home/tiago/Drivers/chromedriver");
-		WebDriver driver = new ChromeDriver();
-		driver.manage().window().setSize(new Dimension(1300, 1050));
-		driver.get("file:///" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
-		
-		driver.findElement(By.id("elementosForm:nome")).sendKeys("Wanderson");
-		driver.findElement(By.id("elementosForm:sobrenome")).sendKeys("Algusto");	
-//		driver.findElement(By.id("elementosForm:sexo")).click();
-		driver.findElement(By.id("elementosForm:cadastrar")).click();
+	public void deveValidarSexo() {		
+		dsl.escrever("elementosForm:nome", "Wanderson");
+		dsl.escrever("elementosForm:sobrenome", "Algusto");
+		dsl.clicarBotao("elementosForm:cadastrar");
 		Alert alert = driver.switchTo().alert();
 		Assert.assertEquals("Sexo obrigatório", "Sexo eh obrigatorio", alert.getText());
-		driver.quit();
 	}
 	
 	@Test
 	public void deveValidarComigdaVegetariana() {
-		System.setProperty("webdriver.chrome.driver", "/home/tiago/Drivers/chromedriver");
-		WebDriver driver = new ChromeDriver();
-		driver.manage().window().setSize(new Dimension(1300, 1050));
-		driver.get("file:///" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
-	
-		driver.findElement(By.id("elementosForm:nome")).sendKeys("Wanderson");
-		driver.findElement(By.id("elementosForm:sobrenome")).sendKeys("Algusto");	
-		driver.findElement(By.id("elementosForm:sexo")).click();
-		driver.findElement(By.id("elementosForm:comidaFavorita:0")).click();
-		driver.findElement(By.id("elementosForm:comidaFavorita:3")).click();
-		driver.findElement(By.id("elementosForm:cadastrar")).click();
+		dsl.escrever("elementosForm:nome", "Wanderson");
+		dsl.escrever("elementosForm:sobrenome", "Algusto");
+		dsl.clicarRadio("elementosForm:sexo");
+		dsl.clicarRadio("elementosForm:comidaFavorita:0");
+		dsl.clicarRadio("elementosForm:comidaFavorita:3");
+		dsl.clicarRadio("elementosForm:cadastrar");
 		Alert alert = driver.switchTo().alert();
 		Assert.assertEquals("Vegetariano", "Tem certeza que voce eh vegetariano?", alert.getText());
-		alert.accept();
-		driver.quit();
+		alert.accept();	
 	}
 	
 	@Test
-	public void deveValidarEsportes() {
-		System.setProperty("webdriver.chrome.driver", "/home/tiago/Drivers/chromedriver");
-		WebDriver driver = new ChromeDriver();
-		driver.manage().window().setSize(new Dimension(1300, 1050));
-		driver.get("file:///" + System.getProperty("user.dir") + "/src/main/resources/componentes.html");
-		
-		driver.findElement(By.id("elementosForm:nome")).sendKeys("Wanderson");
-		driver.findElement(By.id("elementosForm:sobrenome")).sendKeys("Algusto");	
-		driver.findElement(By.id("elementosForm:sexo")).click();
-		driver.findElement(By.id("elementosForm:comidaFavorita:0")).click();
-		driver.findElement(By.id("elementosForm:comidaFavorita:2")).click();
-		Select select = new Select(driver.findElement(By.id("elementosForm:esportes")));
-		select.selectByVisibleText("Natacao");
-		select.selectByValue("nada");
-		driver.findElement(By.id("elementosForm:cadastrar")).click();
+	public void deveValidarEsportes() {	
+		dsl.escrever("elementosForm:nome", "Wanderson");
+		dsl.escrever("elementosForm:sobrenome", "Algusto");
+		dsl.clicarRadio("elementosForm:sexo");
+		dsl.clicarRadio("elementosForm:comidaFavorita:0");
+		dsl.clicarRadio("elementosForm:comidaFavorita:2");
+		dsl.selecionar("elementosForm:esportes", "Natacao");
+		dsl.selecionar("elementosForm:esportes", "O que eh esporte?");
+		dsl.clicarRadio("elementosForm:cadastrar");
 		Alert alert = driver.switchTo().alert();
 		Assert.assertEquals("Esportes", "Voce faz esporte ou nao?", alert.getText());
-		alert.accept();
-		driver.quit();
+		alert.accept();		
 	}
 }
