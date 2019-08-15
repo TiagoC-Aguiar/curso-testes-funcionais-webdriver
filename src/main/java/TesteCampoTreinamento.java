@@ -9,7 +9,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.Select;
 
 public class TesteCampoTreinamento {
 
@@ -57,35 +56,24 @@ public class TesteCampoTreinamento {
 	
 	@Test
 	public void deveVerificarValoresCombo(){
-		WebElement element = driver.findElement(By.id("elementosForm:escolaridade"));
-		Select combo = new Select(element);
-		List<WebElement> options = combo.getOptions();
-		Assert.assertEquals(8, options.size());
-		
-		boolean encontrou = false;
-		for(WebElement option: options) {
-			if(option.getText().equals("Mestrado")){
-				encontrou = true;
-				break;
-			}
-		}
-		Assert.assertTrue(encontrou);
+		String idEscolaridade = "elementosForm:escolaridade";
+		Assert.assertEquals(8, dsl.obterQuantidadeOpcoesCombo(idEscolaridade));
+		Assert.assertTrue(dsl.verificarOpcaoCombro(idEscolaridade, "Mestrado"));
 	}
 	
 	@Test
 	public void deveVerificarValoresComboMultiplo(){		
-		WebElement element = driver.findElement(By.id("elementosForm:esportes"));
-		Select combo = new Select(element);
-		dsl.selecionar("elementosForm:esportes", "Natacao");
-		dsl.selecionar("elementosForm:esportes", "Corrida");
-		dsl.selecionar("elementosForm:esportes", "O que eh esporte?");
+		String idEsportes = "elementosForm:esportes";
+		dsl.selecionar(idEsportes, "Natacao");
+		dsl.selecionar(idEsportes, "Corrida");
+		dsl.selecionar(idEsportes, "O que eh esporte?");
 		
-		List<WebElement> allSelectedOptions = combo.getAllSelectedOptions();
-		Assert.assertEquals(3, allSelectedOptions.size());
-		
-		combo.deselectByVisibleText("Corrida");
-		allSelectedOptions = combo.getAllSelectedOptions();
-		Assert.assertEquals(2, allSelectedOptions.size());
+		List<WebElement> opMarcadas = dsl.obterValoresCombo(idEsportes);
+		Assert.assertEquals(3, opMarcadas.size());		
+
+		dsl.deSelecionarCombo(idEsportes, "Corrida");
+		opMarcadas = dsl.obterValoresCombo(idEsportes);
+		Assert.assertEquals(2, opMarcadas.size());
 	}
 	
 	@Test
@@ -105,6 +93,15 @@ public class TesteCampoTreinamento {
 		Assert.assertEquals("Campo de Treinamento", dsl.obterTexto(By.tagName("h3")));
 		Assert.assertEquals("Cuidado onde clica, muitas armadilhas...", 
 				dsl.obterTexto(By.className("facilAchar")));
+	}
+	
+	@Test
+	public void testTextFieldDuplo() {
+		String campoNome = "elementosForm:nome";
+		dsl.escrever(campoNome, "Wagner");
+		Assert.assertEquals("Wagner", dsl.obterValorCampo(campoNome));
+		dsl.escrever(campoNome, "Acquino");
+		Assert.assertEquals("Acquino", dsl.obterValorCampo(campoNome));		
 	}
 	
 	@After
