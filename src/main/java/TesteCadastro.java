@@ -65,7 +65,7 @@ public class TesteCadastro {
 		page.setNome("Wanderson");
 		page.setSobrenome("Algusto");
 		page.cadastrar();
-		Assert.assertEquals("Sexo obrigatório", "Sexo eh obrigatorio", dsl.alertaObterTextoEAceita());
+		Assert.assertEquals("Sexo eh obrigatorio", dsl.alertaObterTextoEAceita());
 	}
 	
 	@Test
@@ -89,6 +89,6 @@ public class TesteCadastro {
 		page.setComidaPizza();
 		page.setEsportes("Natacao", "O que eh esporte?");		
 		page.cadastrar();		
-		Assert.assertEquals("Esportes", "Voce faz esporte ou nao?", dsl.alertaObterTextoEAceita());		
+		Assert.assertEquals("Voce faz esporte ou nao?", dsl.alertaObterTextoEAceita());		
 	}
 }
