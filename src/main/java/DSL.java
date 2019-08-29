@@ -2,6 +2,7 @@ import java.util.List;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -9,7 +10,6 @@ import org.openqa.selenium.support.ui.Select;
 public class DSL {
 	
 	private WebDriver driver;
-	private String textoAlert;
 	
 	public DSL(WebDriver driver) {
 		this.driver = driver;
@@ -123,6 +123,13 @@ public class DSL {
 	
 	public void trocarJanela(String popup) {
 		driver.switchTo().window(popup);
+	}
+	
+	/**** JS ****/
+	
+	public Object executarJS(String cmd, Object... params) {		
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		return js.executeScript(cmd, params);
 	}
 	
 }
