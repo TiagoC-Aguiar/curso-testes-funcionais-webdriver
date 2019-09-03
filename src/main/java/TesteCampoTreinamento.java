@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -114,6 +113,11 @@ public class TesteCampoTreinamento {
 	public void testJavaScript() {	
 		WebElement element = driver.findElement(By.id("elementosForm:nome"));
 		dsl.executarJS("arguments[0].style.border = arguments[1]", element, "solid 4px #c49");
+	}
+	
+	@Test
+	public void deveClicarBotaoTabela() {
+		dsl.clicarBotaoTabela("Escolaridade", "Mestrado", "Radio", "elementosForm:tableUsuarios");
 	}
 	
 }
